@@ -34,13 +34,10 @@
   @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
   @keyframes shimmer { 0%{background-position:-200% center} 100%{background-position:200% center} }
-
   .wrap { position:relative; z-index:2; max-width:860px; margin:0 auto; padding:32px 14px; }
-
   .badge {
     display:inline-block; border:1px solid #00ffe744; padding:4px 16px;
-    border-radius:2px; font-size:10px; letter-spacing:4px; color:#00ffe7aa;
-    margin-bottom:14px;
+    border-radius:2px; font-size:10px; letter-spacing:4px; color:#00ffe7aa; margin-bottom:14px;
   }
   h1 {
     font-size:clamp(24px,6vw,46px); font-weight:900;
@@ -49,29 +46,38 @@
     background-size:200% auto; animation:shimmer 3s linear infinite;
   }
   .subtitle { color:#4a7fa5; margin-top:10px; font-size:12px; letter-spacing:2px; }
-
   .card {
     background:#0a1628; border:1px solid #00ffe744;
     border-radius:6px; padding:18px; margin-bottom:18px;
   }
   .card.glow { animation: glowPulse 2s ease-in-out infinite; }
   .card label { display:block; font-size:10px; letter-spacing:3px; color:#00ffe7aa; margin-bottom:10px; }
-
+  .keys-card {
+    background:#0a1628; border:1px solid #ffaa0055;
+    border-radius:6px; padding:18px; margin-bottom:18px;
+  }
+  .keys-card label { display:block; font-size:10px; letter-spacing:3px; color:#ffaa00; margin-bottom:8px; }
+  .key-row { margin-bottom:14px; }
+  .key-hint { font-size:9px; color:#4a7fa5; margin-top:5px; letter-spacing:1px; }
   input[type=text], input[type=password] {
     width:100%; background:#060b14; border:1px solid #00ffe733;
     border-radius:3px; padding:11px 13px; color:#e0f0ff;
     font-family:monospace; font-size:14px; outline:none;
   }
   input::placeholder { color:#2a4a6a; }
-
   .btn-primary {
     background:linear-gradient(135deg,#00ffe7,#0060ff);
     border:none; border-radius:3px; padding:11px 22px;
     color:#000; font-family:monospace; font-weight:900;
-    font-size:12px; letter-spacing:2px; cursor:pointer;
-    white-space:nowrap;
+    font-size:12px; letter-spacing:2px; cursor:pointer; white-space:nowrap;
   }
   .btn-primary:disabled { opacity:0.4; cursor:not-allowed; }
+  .btn-save {
+    background:linear-gradient(135deg,#ffaa00,#ff6600);
+    border:none; border-radius:3px; padding:11px 22px;
+    color:#000; font-family:monospace; font-weight:900;
+    font-size:12px; letter-spacing:2px; cursor:pointer; width:100%;
+  }
   .btn-voice {
     background:linear-gradient(135deg,#7700ff,#0060ff);
     border:none; border-radius:3px; padding:10px 20px;
@@ -88,19 +94,11 @@
     padding:9px 16px; color:#00ffe7; font-family:monospace;
     font-size:10px; letter-spacing:2px; cursor:pointer;
   }
-  .btn-settings {
-    background:transparent; border:1px solid #00ffe744; border-radius:2px;
-    padding:6px 14px; color:#00ffe7; font-family:monospace;
-    font-size:10px; letter-spacing:2px; cursor:pointer;
-  }
-
   .input-row { display:flex; gap:10px; flex-wrap:wrap; }
   .input-row input { flex:1; min-width:160px; }
-
   .progress {
     display:flex; align-items:center; justify-content:center;
-    flex-wrap:wrap; gap:4px; margin-bottom:18px;
-    animation:fadeUp 0.4s ease;
+    flex-wrap:wrap; gap:4px; margin-bottom:18px; animation:fadeUp 0.4s ease;
   }
   .step-chip {
     padding:5px 13px; font-size:9px; letter-spacing:2px;
@@ -111,7 +109,6 @@
   .step-chip.done { background:#00ffe7; color:#000; border-color:#00ffe7; }
   .step-line { width:18px; height:1px; background:#1a2a3a; }
   .step-line.done { background:#00ffe7; }
-
   .log-box {
     background:#04080f; border:1px solid #00ffe722;
     border-radius:4px; padding:12px; margin-bottom:18px;
@@ -125,13 +122,11 @@
   .log-error { color:#ff4455; }
   .log-start { color:#aa44ff; }
   .cursor { color:#00ffe7aa; animation:blink 1s infinite; }
-
   .error-box {
     background:#1a0408; border:1px solid #ff445566;
     border-radius:4px; padding:12px; margin-bottom:18px;
     color:#ff6677; font-size:12px;
   }
-
   .title-bar {
     background:linear-gradient(90deg,#00ffe711,transparent);
     border:1px solid #00ffe733; border-radius:4px;
@@ -139,7 +134,6 @@
   }
   .title-label { font-size:9px; letter-spacing:3px; color:#00ffe766; margin-bottom:5px; }
   .title-text { font-size:17px; font-weight:900; color:#e0f0ff; }
-
   .tabs { display:flex; gap:3px; border-bottom:1px solid #1a2a3a; flex-wrap:wrap; }
   .tab-btn {
     background:transparent; border:1px solid #1a2a3a;
@@ -158,7 +152,6 @@
     border-top:none; border-radius:0 2px 6px 6px;
     padding:18px; margin-bottom:18px;
   }
-
   .voice-row { display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; align-items:center; }
   .speaking-indicator { color:#00ffe7; font-size:11px; display:flex; align-items:center; gap:6px; }
   .speak-blink { animation:blink 0.5s infinite; font-size:15px; }
@@ -171,21 +164,18 @@
     color:#c0d8f0; line-height:1.9; font-size:13px;
     white-space:pre-wrap; max-height:300px; overflow-y:auto;
   }
-
   .subtitle-line {
     display:flex; align-items:flex-start; gap:12px;
     background:#060b14; border-radius:2px; padding:9px 12px; margin-bottom:7px;
   }
   .sub-num { color:#00ffe744; font-size:9px; min-width:22px; font-weight:700; padding-top:2px; }
   .sub-text { color:#c0d8f0; font-size:12px; line-height:1.6; }
-
   .hashtag-grid { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
   .hashtag {
     background:#060b14; border:1px solid #00ffe733;
     border-radius:2px; padding:5px 11px;
     color:#00ffe7; font-size:11px; font-weight:700;
   }
-
   .clips-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px; }
   .clip-card { background:#060b14; border:1px solid #1a2a3a; border-radius:6px; overflow:hidden; }
   .clip-thumb { position:relative; aspect-ratio:16/9; background:#000; overflow:hidden; }
@@ -211,10 +201,7 @@
     border:1px solid #00ffe733; color:#00ffe7; font-family:monospace;
     font-size:9px; letter-spacing:1px; padding:6px; border-radius:2px; text-decoration:none;
   }
-  .placeholder-label {
-    text-align:center; color:#2a4a6a; font-size:9px; letter-spacing:1px; padding:7px;
-  }
-
+  .placeholder-label { text-align:center; color:#2a4a6a; font-size:9px; letter-spacing:1px; padding:7px; }
   .stack-bar { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
   .stack-item {
     background:#060b14; border:1px solid #1a2a3a;
@@ -222,20 +209,12 @@
   }
   .stack-label { font-size:8px; letter-spacing:2px; color:#4a7fa5; margin-bottom:4px; }
   .stack-val { font-size:11px; font-weight:700; }
-
-  #pexelsCredit {
-    display:none; text-align:center; font-size:9px;
-    color:#2a4a6a; letter-spacing:2px; margin-top:8px;
+  #pexelsCredit { display:none; text-align:center; font-size:9px; color:#2a4a6a; letter-spacing:2px; margin-top:8px; }
+  .saved-badge {
+    display:inline-block; background:#00ffe722; border:1px solid #00ffe755;
+    color:#00ffe7; font-size:9px; letter-spacing:2px; padding:4px 12px;
+    border-radius:2px; margin-top:10px;
   }
-
-  .settings-panel {
-    display:none; background:#060b14; border:1px solid #00ffe733;
-    border-radius:4px; padding:14px; margin-bottom:14px;
-  }
-  .settings-panel.open { display:block; }
-  .settings-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
-  .settings-row label { font-size:9px; letter-spacing:2px; color:#4a7fa5; min-width:80px; }
-  .settings-row input { flex:1; min-width:140px; }
 </style>
 </head>
 <body>
@@ -243,11 +222,27 @@
 <div class="scanline"></div>
 <div class="wrap">
 
-  <!-- Header -->
   <div style="margin-bottom:24px">
     <div class="badge">AI · VIDEO · GENERATOR</div>
     <h1>AI VIDEO GENERATOR</h1>
     <p class="subtitle">SCRIPT · VOICE · CLIPS · HASHTAGS · SUBTITLES</p>
+  </div>
+
+  <!-- API Keys Card -->
+  <div class="keys-card">
+    <label>⚙ API KEYS — REQUIRED TO USE THE APP</label>
+    <div class="key-row">
+      <div style="font-size:9px;letter-spacing:2px;color:#ffaa00;margin-bottom:6px;">ANTHROPIC KEY (for AI script)</div>
+      <input type="password" id="anthropicKey" placeholder="sk-ant-api03-..." />
+      <div class="key-hint">Get yours at console.anthropic.com</div>
+    </div>
+    <div class="key-row">
+      <div style="font-size:9px;letter-spacing:2px;color:#ffaa00;margin-bottom:6px;">PEXELS KEY (for video clips)</div>
+      <input type="password" id="pexelsKey" placeholder="Paste Pexels API key..." />
+      <div class="key-hint">Get yours at pexels.com/api</div>
+    </div>
+    <button class="btn-save" onclick="saveKeys()">SAVE KEYS ✓</button>
+    <div id="savedBadge" style="display:none" class="saved-badge">✓ KEYS SAVED — READY TO GENERATE</div>
   </div>
 
   <!-- Input -->
@@ -256,16 +251,6 @@
     <div class="input-row">
       <input type="text" id="topicInput" placeholder="e.g. How AI is changing the world..." />
       <button class="btn-primary" id="genBtn" onclick="generate()">GENERATE ▶</button>
-    </div>
-    <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-      <button class="btn-settings" onclick="toggleSettings()">⚙ SETTINGS</button>
-      <span style="font-size:9px;color:#2a4a6a;letter-spacing:1px">ADD API KEYS FOR FULL FEATURES</span>
-    </div>
-    <div class="settings-panel" id="settingsPanel">
-      <div class="settings-row">
-        <label>PEXELS KEY</label>
-        <input type="password" id="pexelsKey" placeholder="Paste Pexels API key..." />
-      </div>
     </div>
   </div>
 
@@ -294,7 +279,6 @@
       <div class="title-label">GENERATED TITLE</div>
       <div class="title-text" id="resultTitle"></div>
     </div>
-
     <div class="tabs">
       <button class="tab-btn active" onclick="switchTab('script',this)">SCRIPT</button>
       <button class="tab-btn" onclick="switchTab('subtitles',this)">SUBTITLES</button>
@@ -302,8 +286,6 @@
       <button class="tab-btn" onclick="switchTab('clips',this)">CLIPS</button>
       <button class="tab-btn" onclick="switchTab('stack',this)">STACK</button>
     </div>
-
-    <!-- Script tab -->
     <div class="tab-content" id="tab-script">
       <div class="tts-tip">⚡ TTS uses your browser's built-in voice engine. Works best in Chrome.</div>
       <div class="voice-row">
@@ -316,26 +298,18 @@
       </div>
       <div class="script-text" id="scriptText"></div>
     </div>
-
-    <!-- Subtitles tab -->
     <div class="tab-content" id="tab-subtitles" style="display:none">
       <div id="subtitlesList"></div>
     </div>
-
-    <!-- Hashtags tab -->
     <div class="tab-content" id="tab-hashtags" style="display:none">
       <div class="hashtag-grid" id="hashtagGrid"></div>
       <button class="btn-outline" onclick="copyHashtags()">COPY ALL HASHTAGS</button>
     </div>
-
-    <!-- Clips tab -->
     <div class="tab-content" id="tab-clips" style="display:none">
       <div style="font-size:9px;letter-spacing:2px;color:#4a7fa5;margin-bottom:12px" id="clipsLabel"></div>
       <div class="clips-grid" id="clipsGrid"></div>
       <div id="pexelsCredit">Videos provided by Pexels · pexels.com</div>
     </div>
-
-    <!-- Stack tab -->
     <div class="tab-content" id="tab-stack" style="display:none">
       <div style="font-size:9px;letter-spacing:2px;color:#4a7fa5;margin-bottom:12px">TECH STACK</div>
       <div class="stack-bar" id="stackBar"></div>
@@ -367,8 +341,12 @@ function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function toggleSettings() {
-  document.getElementById('settingsPanel').classList.toggle('open');
+function saveKeys() {
+  const ak = document.getElementById('anthropicKey').value.trim();
+  const pk = document.getElementById('pexelsKey').value.trim();
+  if (!ak) { alert('Please enter your Anthropic API key!'); return; }
+  document.getElementById('savedBadge').style.display = 'inline-block';
+  setTimeout(() => document.getElementById('savedBadge').style.display = 'none', 3000);
 }
 
 function switchTab(name, btn) {
@@ -422,7 +400,6 @@ function playVoice() {
   document.getElementById('playBtn').style.display = 'none';
   document.getElementById('stopBtn').style.display = 'inline-block';
   document.getElementById('speakIndicator').style.display = 'flex';
-
   function speakNext() {
     if (!isSpeaking || sentenceIdx >= sentences.length) {
       if (sentenceIdx >= sentences.length) stopVoice();
@@ -434,13 +411,9 @@ function playVoice() {
     utt.onerror = () => { if (isSpeaking) speakNext(); };
     speechSynthesis.speak(utt);
   }
-
   resumeInterval = setInterval(() => {
-    if (!speechSynthesis.speaking && !speechSynthesis.pending && isSpeaking && sentenceIdx < sentences.length) {
-      speakNext();
-    }
+    if (!speechSynthesis.speaking && !speechSynthesis.pending && isSpeaking && sentenceIdx < sentences.length) speakNext();
   }, 2000);
-
   setTimeout(() => speakNext(), 150);
 }
 
@@ -455,8 +428,7 @@ function stopVoice() {
 }
 
 function copyScript() {
-  if (currentResult) navigator.clipboard?.writeText(currentResult.script)
-    .then(() => alert('Script copied!'));
+  if (currentResult) navigator.clipboard?.writeText(currentResult.script).then(() => alert('Script copied!'));
 }
 
 function copyHashtags() {
@@ -466,9 +438,11 @@ function copyHashtags() {
 }
 
 async function generateScript(topic) {
+  const ak = document.getElementById('anthropicKey').value.trim();
+  if (!ak) throw new Error('Please enter your Anthropic API key and tap SAVE KEYS first!');
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', 'x-api-key': ak, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 4000,
@@ -476,37 +450,5 @@ async function generateScript(topic) {
       messages: [{ role: 'user', content: 'Topic: ' + topic }]
     })
   });
-  if (!res.ok) throw new Error('API error ' + res.status);
-  const data = await res.json();
-  let text = data.content.map(b => b.text || '').join('');
-  let clean = text.replace(/```json|```/g, '').trim();
-  try { return JSON.parse(clean); } catch {
-    addLog('Repairing JSON...', 'warn');
-    const lb = clean.lastIndexOf('}');
-    if (lb > 0) {
-      let attempt = clean.substring(0, lb + 1);
-      const opens = (attempt.match(/\[/g)||[]).length - (attempt.match(/\]/g)||[]).length;
-      if (opens > 0) attempt = attempt.replace(/,?\s*$/, '') + ']'.repeat(opens) + '}';
-      try { return JSON.parse(attempt); } catch {}
-    }
-    throw new Error('Invalid JSON from AI — please try again.');
-  }
-}
-
-function makePlaceholders(query) {
-  const s = encodeURIComponent(query);
-  return [1,2,3,4].map(i => ({
-    id: i, url: null, pexelsPage: null,
-    thumb: `https://picsum.photos/seed/${s}${i}/400/225`
-  }));
-}
-
-async function fetchClips(query, key) {
-  if (!key) {
-    addLog('No Pexels key — showing placeholders.', 'warn');
-    return makePlaceholders(query);
-  }
-  addLog(`Searching Pexels: "${query}"...`, 'info');
-  try {
-    const res = await fetch(
-      `https://api.pexels.com/v
+  if (!res.ok) throw new Error('API error ' + res.status + ' — check your Anthropic key');
+  const data = a
