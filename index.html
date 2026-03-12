@@ -372,7 +372,7 @@ let isSpeaking = false;
 let sentences = [];
 let sentenceIdx = 0;
 let resumeInterval = null;
-let savedAnthropicKey = '';
+let savedGroqKey = '';
 let savedPexelsKey = '';
 let selectedStyle = 'MOTIVATIONAL';
 let selectedLength = '60 SEC';
@@ -381,7 +381,7 @@ window.addEventListener('load', () => {
   try {
     const ak = localStorage.getItem('av_groq_key');
     const pk = localStorage.getItem('av_pexels_key');
-    if (ak) { document.getElementById('anthropicKey').value = ak; savedAnthropicKey = ak; }
+    if (ak) { document.getElementById('anthropicKey').value = ak; savedGroqKey = ak; }
     if (pk) { document.getElementById('pexelsKey').value = pk; savedPexelsKey = pk; }
     if (ak) {
       const ind = document.createElement('div');
@@ -407,7 +407,7 @@ function saveKeys() {
   const ak = document.getElementById('anthropicKey').value.trim();
   const pk = document.getElementById('pexelsKey').value.trim();
   if (!ak) { alert('Please enter your Anthropic API key!'); return; }
-  savedAnthropicKey = ak;
+  savedGroqKey = ak;
   savedPexelsKey = pk;
   try {
     localStorage.setItem('av_groq_key', ak);
@@ -537,7 +537,7 @@ async function generateScript(topic) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + savedAnthropicKey
+      'Authorization': 'Bearer ' + savedGroqKey
     },
     body: JSON.stringify({
       model: 'llama3-70b-8192',
@@ -637,7 +637,7 @@ async function generate() {
   if (isGenerating) return;
   const topic = document.getElementById('topicInput').value.trim();
   if (!topic) { alert('Please enter a video topic!'); return; }
-  if (!savedAnthropicKey) { alert('Please enter your Anthropic API key and tap SAVE KEYS first!'); return; }
+  if (!savedGroqKey) { alert('Please enter your Anthropic API key and tap SAVE KEYS first!'); return; }
   isGenerating = true;
   stopVoice(); showError('');
   document.getElementById('logBox').innerHTML = '<span class="cursor" id="cursor">█</span>';
