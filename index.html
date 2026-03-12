@@ -15,6 +15,8 @@ button { width: 100%; padding: 14px; border: none; border-radius: 4px; font-fami
 .btn-save { background: #ffaa00; color: #000; }
 .btn-generate { background: #00ffe7; color: #000; }
 .btn-generate:disabled { opacity: 0.4; }
+.btn-play { background: #7700ff; color: #fff; }
+.btn-stop { background: #1a0408; border: 2px solid #ff4455; color: #ff4455; }
 .pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
 .pill { background: #060b14; border: 1px solid #00ffe733; border-radius: 20px; padding: 6px 14px; color: #4a7fa5; font-size: 11px; cursor: pointer; }
 .pill.active { background: #00ffe722; border-color: #00ffe7; color: #00ffe7; }
@@ -30,6 +32,9 @@ button { width: 100%; padding: 14px; border: none; border-radius: 4px; font-fami
 .clip a { display: block; text-align: center; background: #00ffe7; color: #000; padding: 6px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; margin-top: 4px; }
 .section-title { font-size: 10px; letter-spacing: 2px; color: #00ffe7; margin: 12px 0 8px; }
 .copy-btn { background: transparent; border: 1px solid #00ffe733; color: #00ffe7; width: auto; padding: 8px 16px; font-size: 10px; margin-top: 8px; }
+.voice-row { display: flex; gap: 8px; margin-bottom: 12px; }
+.voice-row button { width: auto; padding: 10px 18px; font-size: 11px; }
+.speaking { color: #00ffe7; font-size: 11px; margin-bottom: 8px; display: none; }
 </style>
 </head>
 <body>
@@ -59,6 +64,7 @@ button { width: 100%; padding: 14px; border: none; border-radius: 4px; font-fami
     <div class="pill" onclick="pickPill(this,'length')">30 SEC</div>
     <div class="pill active" onclick="pickPill(this,'length')">60 SEC</div>
     <div class="pill" onclick="pickPill(this,'length')">3 MIN</div>
+    <div class="pill" onclick="pickPill(this,'length')">5 MIN</div>
   </div>
   <button class="btn-generate" id="genBtn" onclick="generate()">GENERATE ▶</button>
 </div>
@@ -68,12 +74,22 @@ button { width: 100%; padding: 14px; border: none; border-radius: 4px; font-fami
 
 <div class="result-card" id="results">
   <div class="result-title" id="resultTitle"></div>
+
   <div class="section-title">SCRIPT</div>
   <div class="script-box" id="scriptBox"></div>
+
+  <div class="section-title">VOICE</div>
+  <div class="speaking" id="speaking">● SPEAKING...</div>
+  <div class="voice-row">
+    <button class="btn-play" id="playBtn" onclick="playVoice()">▶ PLAY VOICE</button>
+    <button class="btn-stop" id="stopBtn" onclick="stopVoice()" style="display:none">■ STOP</button>
+  </div>
   <button class="copy-btn" onclick="copyText('scriptBox')">COPY SCRIPT</button>
+
   <div class="section-title">HASHTAGS</div>
   <div class="tags" id="tagsBox"></div>
   <button class="copy-btn" onclick="copyTags()">COPY HASHTAGS</button>
+
   <div class="section-title">VIDEO CLIPS (PEXELS)</div>
   <div class="clips" id="clipsBox"></div>
 </div>
@@ -84,6 +100,10 @@ var pexelsKey = '';
 var style = 'MOTIVATIONAL';
 var length = '60 SEC';
 var busy = false;
+var speaking = false;
+var sentences = [];
+var sentenceIdx = 0;
+var resumeTimer = null;
 
 window.onload = function() {
   try {
@@ -143,9 +163,56 @@ function copyTags() {
   navigator.clipboard.writeText(text).then(function() { alert('Copied!'); });
 }
 
+function playVoice() {
+  var script = document.getElementById('scriptBox').textContent;
+  if (!script) return;
+  if (!('speechSynthesis' in window)) { alert('Voice not supported in this browser.'); return; }
+  stopVoice();
+  speaking = true;
+  sentences = script.match(/[^.!?]+[.!?]+/g) || [script];
+  sentenceIdx = 0;
+  document.getElementById('playBtn').style.display = 'none';
+  document.getElementById('stopBtn').style.display = 'inline-block';
+  document.getElementById('speaking').style.display = 'block';
+
+  function speakNext() {
+    if (!speaking || sentenceIdx >= sentences.length) {
+      if (sentenceIdx >= sentences.length) stopVoice();
+      return;
+    }
+    var utt = new SpeechSynthesisUtterance(sentences[sentenceIdx++]);
+    utt.rate = 1.05;
+    utt.pitch = 1;
+    utt.volume = 1;
+    utt.onend = function() { if (speaking) speakNext(); };
+    utt.onerror = function() { if (speaking) speakNext(); };
+    speechSynthesis.speak(utt);
+  }
+
+  resumeTimer = setInterval(function() {
+    if (!speechSynthesis.speaking && !speechSynthesis.pending && speaking && sentenceIdx < sentences.length) {
+      speakNext();
+    }
+  }, 2000);
+
+  setTimeout(function() { speakNext(); }, 150);
+}
+
+function stopVoice() {
+  speaking = false;
+  clearInterval(resumeTimer);
+  if ('speechSynthesis' in window) speechSynthesis.cancel();
+  sentences = [];
+  sentenceIdx = 0;
+  document.getElementById('playBtn').style.display = 'inline-block';
+  document.getElementById('stopBtn').style.display = 'none';
+  document.getElementById('speaking').style.display = 'none';
+}
+
 function getWordCount() {
   if (length === '30 SEC') return '75-90';
   if (length === '3 MIN') return '450-500';
+  if (length === '5 MIN') return '700-750';
   return '150-180';
 }
 
@@ -163,6 +230,7 @@ async function generate() {
   if (!groqKey) { alert('Please enter your Groq key and tap SAVE KEYS first!'); return; }
 
   busy = true;
+  stopVoice();
   document.getElementById('log').innerHTML = '';
   document.getElementById('error').style.display = 'none';
   document.getElementById('results').style.display = 'none';
@@ -182,7 +250,7 @@ async function generate() {
       },
       body: JSON.stringify({
         model: 'llama-3.3-70b-versatile',
-        max_tokens: 2000,
+        max_tokens: 3000,
         messages: [{ role: 'user', content: prompt }]
       })
     });
