@@ -280,7 +280,7 @@ async function generate() {
     if (pexelsKey) {
       addLog('Fetching Pexels clips...');
       try {
-        var pr = await fetch('https://api.pexels.com/videos/search?query=' + encodeURIComponent(result.searchQuery || topic) + '&per_page=4', {
+        var pr = await fetch('https://api.pexels.com/videos/search?query=' + encodeURIComponent(result.searchQuery || topic) + '&per_page=20', {
           headers: { Authorization: pexelsKey }
         });
         var pdata = await pr.json();
