@@ -2,687 +2,237 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Video Generator</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    min-height: 100vh;
-    background: #060b14;
-    color: #e0f0ff;
-    font-family: 'Courier New', monospace;
-    overflow-x: hidden;
-  }
-  .grid-bg {
-    position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    background-image:
-      linear-gradient(rgba(0,255,231,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,231,0.04) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
-  .scanline {
-    position: fixed; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent, #00ffe7, transparent);
-    animation: scanline 4s linear infinite;
-    pointer-events: none; z-index: 1; opacity: 0.3;
-  }
-  @keyframes scanline { 0%{transform:translateY(-10px)} 100%{transform:translateY(100vh)} }
-  @keyframes glowPulse {
-    0%,100%{box-shadow:0 0 20px #00ffe7aa,0 0 40px #00ffe744}
-    50%{box-shadow:0 0 40px #00ffe7ff,0 0 80px #00ffe788}
-  }
-  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
-  @keyframes shimmer { 0%{background-position:-200% center} 100%{background-position:200% center} }
-  @keyframes spin { to{transform:rotate(360deg)} }
-  .wrap { position:relative; z-index:2; max-width:860px; margin:0 auto; padding:32px 14px; }
-  .badge {
-    display:inline-block; border:1px solid #00ffe744; padding:4px 16px;
-    border-radius:2px; font-size:10px; letter-spacing:4px; color:#00ffe7aa; margin-bottom:14px;
-  }
-  h1 {
-    font-size:clamp(24px,6vw,46px); font-weight:900;
-    background:linear-gradient(135deg,#00ffe7,#0080ff,#7700ff);
-    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-    background-size:200% auto; animation:shimmer 3s linear infinite;
-  }
-  .subtitle { color:#4a7fa5; margin-top:10px; font-size:12px; letter-spacing:2px; }
-  .card {
-    background:#0a1628; border:1px solid #00ffe744;
-    border-radius:6px; padding:18px; margin-bottom:18px;
-  }
-  .card.glow { animation: glowPulse 2s ease-in-out infinite; }
-  .card label { display:block; font-size:10px; letter-spacing:3px; color:#00ffe7aa; margin-bottom:10px; }
-  .keys-card {
-    background:#0a1628; border:1px solid #ffaa0055;
-    border-radius:6px; padding:18px; margin-bottom:18px;
-  }
-  .key-row { margin-bottom:14px; }
-  .key-label { font-size:9px; letter-spacing:2px; color:#ffaa00; margin-bottom:6px; }
-  .key-hint { font-size:9px; color:#4a7fa5; margin-top:5px; letter-spacing:1px; }
-  .keys-title { font-size:10px; letter-spacing:3px; color:#ffaa00; margin-bottom:14px; }
-  input[type=text], input[type=password] {
-    width:100%; background:#060b14; border:1px solid #00ffe733;
-    border-radius:3px; padding:11px 13px; color:#e0f0ff;
-    font-family:monospace; font-size:14px; outline:none;
-  }
-  input::placeholder { color:#2a4a6a; }
-  .btn-primary {
-    background:linear-gradient(135deg,#00ffe7,#0060ff);
-    border:none; border-radius:3px; padding:11px 22px;
-    color:#000; font-family:monospace; font-weight:900;
-    font-size:12px; letter-spacing:2px; cursor:pointer; white-space:nowrap;
-  }
-  .btn-primary:disabled { opacity:0.4; cursor:not-allowed; }
-  .btn-save {
-    background:linear-gradient(135deg,#ffaa00,#ff6600);
-    border:none; border-radius:3px; padding:13px 22px;
-    color:#000; font-family:monospace; font-weight:900;
-    font-size:12px; letter-spacing:2px; cursor:pointer; width:100%; margin-top:4px;
-  }
-  .btn-voice {
-    background:linear-gradient(135deg,#7700ff,#0060ff);
-    border:none; border-radius:3px; padding:10px 20px;
-    color:#fff; font-family:monospace; font-weight:900;
-    font-size:11px; letter-spacing:2px; cursor:pointer;
-  }
-  .btn-stop {
-    background:#1a0408; border:2px solid #ff4455; border-radius:3px;
-    padding:10px 20px; color:#ff4455; font-family:monospace;
-    font-weight:900; font-size:11px; letter-spacing:2px; cursor:pointer;
-  }
-  .btn-outline {
-    background:transparent; border:1px solid #00ffe733; border-radius:3px;
-    padding:9px 16px; color:#00ffe7; font-family:monospace;
-    font-size:10px; letter-spacing:2px; cursor:pointer;
-  }
-  .input-row { display:flex; gap:10px; flex-wrap:wrap; }
-  .input-row input { flex:1; min-width:160px; }
-  .options-row { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
-  .option-group { flex:1; min-width:130px; }
-  .option-label { font-size:9px; letter-spacing:2px; color:#00ffe7aa; margin-bottom:6px; }
-  .option-pills { display:flex; gap:6px; flex-wrap:wrap; }
-  .pill {
-    background:#060b14; border:1px solid #00ffe733; border-radius:20px;
-    padding:6px 12px; color:#4a7fa5; font-family:monospace;
-    font-size:10px; letter-spacing:1px; cursor:pointer; transition:all 0.2s;
-  }
-  .pill.active { background:#00ffe722; border-color:#00ffe7; color:#00ffe7; }
-  .progress {
-    display:flex; align-items:center; justify-content:center;
-    flex-wrap:wrap; gap:4px; margin-bottom:18px; animation:fadeUp 0.4s ease;
-  }
-  .step-chip {
-    padding:5px 13px; font-size:9px; letter-spacing:2px;
-    border-radius:2px; font-weight:700; border:1px solid #1a2a3a;
-    color:#2a4a6a; background:#060b14; transition:all 0.3s;
-  }
-  .step-chip.active { background:#0a1628; color:#00ffe7; border-color:#00ffe7; box-shadow:0 0 10px #00ffe788; }
-  .step-chip.done { background:#00ffe7; color:#000; border-color:#00ffe7; }
-  .step-line { width:18px; height:1px; background:#1a2a3a; }
-  .step-line.done { background:#00ffe7; }
-  .spinner-wrap { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
-  .spinner {
-    width:18px; height:18px; border:2px solid #00ffe722;
-    border-top-color:#00ffe7; border-radius:50%;
-    animation:spin 0.8s linear infinite;
-  }
-  .spinner-text { font-size:11px; color:#00ffe7; letter-spacing:2px; }
-  .log-box {
-    background:#04080f; border:1px solid #00ffe722;
-    border-radius:4px; padding:12px; margin-bottom:18px;
-    max-height:110px; overflow-y:auto; font-size:11px;
-  }
-  .log-line { margin-bottom:2px; line-height:1.6; }
-  .log-time { color:#1a3a5a; margin-right:8px; }
-  .log-info { color:#4a7fa5; }
-  .log-success { color:#00ffe7; }
-  .log-warn { color:#ffaa00; }
-  .log-error { color:#ff4455; }
-  .log-start { color:#aa44ff; }
-  .cursor { color:#00ffe7aa; animation:blink 1s infinite; }
-  .error-box {
-    background:#1a0408; border:1px solid #ff445566;
-    border-radius:4px; padding:14px; margin-bottom:18px;
-    color:#ff6677; font-size:12px; line-height:1.8;
-  }
-  .title-bar {
-    background:linear-gradient(90deg,#00ffe711,transparent);
-    border:1px solid #00ffe733; border-radius:4px;
-    padding:14px 18px; margin-bottom:16px; animation:fadeUp 0.5s ease;
-  }
-  .title-label { font-size:9px; letter-spacing:3px; color:#00ffe766; margin-bottom:5px; }
-  .title-text { font-size:17px; font-weight:900; color:#e0f0ff; }
-  .tabs { display:flex; gap:3px; border-bottom:1px solid #1a2a3a; flex-wrap:wrap; }
-  .tab-btn {
-    background:transparent; border:1px solid #1a2a3a;
-    border-bottom:1px solid #1a2a3a; color:#4a7fa5;
-    padding:7px 14px; font-size:9px; letter-spacing:2px;
-    cursor:pointer; border-radius:2px 2px 0 0;
-    font-family:monospace; font-weight:700;
-    transform:translateY(1px); transition:all 0.2s;
-  }
-  .tab-btn.active { background:#0a1628; border-color:#00ffe7; border-bottom-color:#0a1628; color:#00ffe7; }
-  .tab-content {
-    background:#0a1628; border:1px solid #1a2a3a;
-    border-top:none; border-radius:0 2px 6px 6px;
-    padding:18px; margin-bottom:18px;
-  }
-  .voice-row { display:flex; gap:10px; margin-bottom:14px; flex-wrap:wrap; align-items:center; }
-  .speaking-indicator { color:#00ffe7; font-size:11px; display:flex; align-items:center; gap:6px; }
-  .speak-blink { animation:blink 0.5s infinite; font-size:15px; }
-  .tts-tip {
-    background:#060b14; border:1px solid #ffaa0033;
-    border-radius:3px; padding:8px 12px; margin-bottom:12px;
-    font-size:10px; color:#ffaa00; line-height:1.6;
-  }
-  .script-text {
-    color:#c0d8f0; line-height:1.9; font-size:13px;
-    white-space:pre-wrap; max-height:300px; overflow-y:auto;
-  }
-  .subtitle-line {
-    display:flex; align-items:flex-start; gap:12px;
-    background:#060b14; border-radius:2px; padding:9px 12px; margin-bottom:7px;
-  }
-  .sub-num { color:#00ffe744; font-size:9px; min-width:22px; font-weight:700; padding-top:2px; }
-  .sub-text { color:#c0d8f0; font-size:12px; line-height:1.6; }
-  .hashtag-grid { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
-  .hashtag {
-    background:#060b14; border:1px solid #00ffe733;
-    border-radius:2px; padding:5px 11px; color:#00ffe7; font-size:11px; font-weight:700;
-  }
-  .clips-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px; }
-  .clip-card { background:#060b14; border:1px solid #1a2a3a; border-radius:6px; overflow:hidden; }
-  .clip-thumb { position:relative; aspect-ratio:16/9; background:#000; overflow:hidden; }
-  .clip-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
-  .play-overlay {
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
-    background:rgba(0,0,0,0.3);
-  }
-  .play-circle {
-    width:36px; height:36px; border-radius:50%;
-    background:rgba(0,255,231,0.85); display:flex;
-    align-items:center; justify-content:center;
-    font-size:13px; padding-left:3px; color:#000;
-  }
-  .clip-btns { padding:8px; display:flex; flex-direction:column; gap:5px; }
-  .btn-open-video {
-    display:block; text-align:center; background:linear-gradient(135deg,#00ffe7,#0060ff);
-    color:#000; font-family:monospace; font-weight:900; font-size:9px;
-    letter-spacing:1px; padding:7px; border-radius:2px; text-decoration:none;
-  }
-  .btn-pexels-page {
-    display:block; text-align:center; background:transparent;
-    border:1px solid #00ffe733; color:#00ffe7; font-family:monospace;
-    font-size:9px; letter-spacing:1px; padding:6px; border-radius:2px; text-decoration:none;
-  }
-  .placeholder-label { text-align:center; color:#2a4a6a; font-size:9px; letter-spacing:1px; padding:7px; }
-  .stack-bar { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
-  .stack-item {
-    background:#060b14; border:1px solid #1a2a3a;
-    border-radius:3px; padding:8px 12px; flex:1; min-width:90px;
-  }
-  .stack-label { font-size:8px; letter-spacing:2px; color:#4a7fa5; margin-bottom:4px; }
-  .stack-val { font-size:11px; font-weight:700; }
-  #pexelsCredit { display:none; text-align:center; font-size:9px; color:#2a4a6a; letter-spacing:2px; margin-top:8px; }
-  .saved-badge {
-    display:block; background:#00ffe722; border:1px solid #00ffe755;
-    color:#00ffe7; font-size:9px; letter-spacing:2px; padding:8px 14px;
-    border-radius:2px; margin-top:10px; text-align:center;
-  }
-  .keys-saved-indicator { font-size:9px; color:#00ffe7; letter-spacing:2px; margin-top:8px; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #060b14; color: #e0f0ff; font-family: monospace; padding: 20px; }
+h1 { font-size: 24px; color: #00ffe7; margin-bottom: 20px; text-align: center; }
+.card { background: #0a1628; border: 1px solid #00ffe744; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+label { display: block; font-size: 11px; color: #00ffe7; margin-bottom: 6px; letter-spacing: 2px; }
+input { width: 100%; background: #060b14; border: 1px solid #00ffe733; border-radius: 4px; padding: 10px; color: #e0f0ff; font-family: monospace; font-size: 14px; margin-bottom: 10px; }
+button { width: 100%; padding: 14px; border: none; border-radius: 4px; font-family: monospace; font-weight: bold; font-size: 14px; cursor: pointer; margin-bottom: 8px; }
+.btn-save { background: #ffaa00; color: #000; }
+.btn-generate { background: #00ffe7; color: #000; }
+.btn-generate:disabled { opacity: 0.4; }
+.pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.pill { background: #060b14; border: 1px solid #00ffe733; border-radius: 20px; padding: 6px 14px; color: #4a7fa5; font-size: 11px; cursor: pointer; }
+.pill.active { background: #00ffe722; border-color: #00ffe7; color: #00ffe7; }
+.log { background: #04080f; border: 1px solid #00ffe722; border-radius: 4px; padding: 10px; margin-bottom: 16px; font-size: 11px; min-height: 60px; display: none; }
+.error { background: #1a0408; border: 1px solid #ff4455; border-radius: 4px; padding: 12px; color: #ff6677; margin-bottom: 16px; display: none; }
+.result-card { background: #0a1628; border: 1px solid #00ffe744; border-radius: 8px; padding: 16px; margin-bottom: 16px; display: none; }
+.result-title { font-size: 16px; font-weight: bold; color: #00ffe7; margin-bottom: 12px; }
+.script-box { color: #c0d8f0; line-height: 1.8; font-size: 13px; white-space: pre-wrap; margin-bottom: 12px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.tag { background: #060b14; border: 1px solid #00ffe733; border-radius: 2px; padding: 4px 10px; color: #00ffe7; font-size: 11px; }
+.clips { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
+.clip img { width: 100%; border-radius: 4px; aspect-ratio: 16/9; object-fit: cover; }
+.clip a { display: block; text-align: center; background: #00ffe7; color: #000; padding: 6px; border-radius: 4px; text-decoration: none; font-size: 11px; font-weight: bold; margin-top: 4px; }
+.section-title { font-size: 10px; letter-spacing: 2px; color: #00ffe7; margin: 12px 0 8px; }
+.copy-btn { background: transparent; border: 1px solid #00ffe733; color: #00ffe7; width: auto; padding: 8px 16px; font-size: 10px; margin-top: 8px; }
 </style>
 </head>
 <body>
-<div class="grid-bg"></div>
-<div class="scanline"></div>
-<div class="wrap">
+<h1>⚡ AI VIDEO GENERATOR</h1>
 
-  <div style="margin-bottom:24px">
-    <div class="badge">AI · VIDEO · GENERATOR</div>
-    <h1>AI VIDEO GENERATOR</h1>
-    <p class="subtitle">SCRIPT · VOICE · CLIPS · HASHTAGS · SUBTITLES</p>
-  </div>
-
-  <div class="keys-card">
-    <div class="keys-title">⚙ API KEYS</div>
-    <div class="key-row">
-      <div class="key-label">GROQ KEY (for AI script)</div>
-      <input type="password" id="anthropicKey" placeholder="sk-ant-..." />
-      <div class="key-hint">Get yours at console.anthropic.com</div>
-    </div>
-    <div class="key-row">
-      <div class="key-label">PEXELS KEY (for video clips)</div>
-      <input type="password" id="pexelsKey" placeholder="Paste Pexels API key..." />
-      <div class="key-hint">Get yours at pexels.com/api</div>
-    </div>
-    <button class="btn-save" onclick="saveKeys()">SAVE KEYS ✓</button>
-    <div id="savedBadge" style="display:none" class="saved-badge">✓ KEYS SAVED — WILL BE REMEMBERED ON THIS DEVICE</div>
-  </div>
-
-  <div class="card" id="inputCard">
-    <label>VIDEO TOPIC</label>
-    <div class="input-row">
-      <input type="text" id="topicInput" placeholder="e.g. Romans 10:9-10..." />
-      <button class="btn-primary" id="genBtn" onclick="generate()">GENERATE ▶</button>
-    </div>
-    <div class="options-row">
-      <div class="option-group">
-        <div class="option-label">VIDEO STYLE</div>
-        <div class="option-pills">
-          <div class="pill active" onclick="selectPill(this,'style')">MOTIVATIONAL</div>
-          <div class="pill" onclick="selectPill(this,'style')">EDUCATIONAL</div>
-          <div class="pill" onclick="selectPill(this,'style')">STORYTELLING</div>
-          <div class="pill" onclick="selectPill(this,'style')">FUNNY</div>
-        </div>
-      </div>
-    </div>
-    <div class="options-row">
-      <div class="option-group">
-        <div class="option-label">VIDEO LENGTH</div>
-        <div class="option-pills">
-          <div class="pill" onclick="selectPill(this,'length')">30 SEC</div>
-          <div class="pill active" onclick="selectPill(this,'length')">60 SEC</div>
-          <div class="pill" onclick="selectPill(this,'length')">3 MIN</div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="progress" id="progress" style="display:none">
-    <div class="step-chip" id="step-script">SCRIPT</div>
-    <div class="step-line" id="line-1"></div>
-    <div class="step-chip" id="step-clips">CLIPS</div>
-    <div class="step-line" id="line-2"></div>
-    <div class="step-chip" id="step-render">RENDER</div>
-    <div class="step-line" id="line-3"></div>
-    <div class="step-chip" id="step-done">DONE</div>
-  </div>
-
-  <div class="spinner-wrap" id="spinnerWrap" style="display:none">
-    <div class="spinner"></div>
-    <div class="spinner-text" id="spinnerText">GENERATING...</div>
-  </div>
-
-  <div class="log-box" id="logBox" style="display:none">
-    <span class="cursor" id="cursor">█</span>
-  </div>
-
-  <div class="error-box" id="errorBox" style="display:none"></div>
-
-  <div id="results" style="display:none">
-    <div class="title-bar">
-      <div class="title-label">GENERATED TITLE</div>
-      <div class="title-text" id="resultTitle"></div>
-    </div>
-    <div class="tabs">
-      <button class="tab-btn active" onclick="switchTab('script',this)">SCRIPT</button>
-      <button class="tab-btn" onclick="switchTab('subtitles',this)">SUBTITLES</button>
-      <button class="tab-btn" onclick="switchTab('hashtags',this)">HASHTAGS</button>
-      <button class="tab-btn" onclick="switchTab('clips',this)">CLIPS</button>
-      <button class="tab-btn" onclick="switchTab('stack',this)">STACK</button>
-    </div>
-    <div class="tab-content" id="tab-script">
-      <div class="tts-tip">⚡ TTS uses your browser's built-in voice engine. Works best in Chrome.</div>
-      <div class="voice-row">
-        <button class="btn-voice" id="playBtn" onclick="playVoice()">▶ PLAY VOICE</button>
-        <button class="btn-stop" id="stopBtn" onclick="stopVoice()" style="display:none">■ STOP</button>
-        <div class="speaking-indicator" id="speakIndicator" style="display:none">
-          <span class="speak-blink">●</span> SPEAKING...
-        </div>
-        <button class="btn-outline" onclick="copyScript()">COPY SCRIPT</button>
-      </div>
-      <div class="script-text" id="scriptText"></div>
-    </div>
-    <div class="tab-content" id="tab-subtitles" style="display:none">
-      <div style="margin-bottom:12px">
-        <button class="btn-outline" onclick="copySubtitles()">COPY ALL SUBTITLES</button>
-      </div>
-      <div id="subtitlesList"></div>
-    </div>
-    <div class="tab-content" id="tab-hashtags" style="display:none">
-      <div class="hashtag-grid" id="hashtagGrid"></div>
-      <button class="btn-outline" onclick="copyHashtags()">COPY ALL HASHTAGS</button>
-    </div>
-    <div class="tab-content" id="tab-clips" style="display:none">
-      <div style="font-size:9px;letter-spacing:2px;color:#4a7fa5;margin-bottom:12px" id="clipsLabel"></div>
-      <div class="clips-grid" id="clipsGrid"></div>
-      <div id="pexelsCredit">Videos provided by Pexels · pexels.com</div>
-    </div>
-    <div class="tab-content" id="tab-stack" style="display:none">
-      <div style="font-size:9px;letter-spacing:2px;color:#4a7fa5;margin-bottom:12px">TECH STACK</div>
-      <div class="stack-bar" id="stackBar"></div>
-    </div>
-  </div>
-
+<div class="card">
+  <label>GROQ API KEY (FREE)</label>
+  <input type="password" id="groqKey" placeholder="gsk_..." />
+  <label>PEXELS API KEY (FREE)</label>
+  <input type="password" id="pexelsKey" placeholder="Pexels key..." />
+  <button class="btn-save" onclick="saveKeys()">SAVE KEYS ✓</button>
+  <div id="keyStatus" style="color:#00ffe7;font-size:11px;display:none">✓ Keys saved!</div>
 </div>
+
+<div class="card">
+  <label>VIDEO TOPIC</label>
+  <input type="text" id="topic" placeholder="e.g. Romans 10:9-10..." />
+  <label>STYLE</label>
+  <div class="pills">
+    <div class="pill active" onclick="pickPill(this,'style')">MOTIVATIONAL</div>
+    <div class="pill" onclick="pickPill(this,'style')">EDUCATIONAL</div>
+    <div class="pill" onclick="pickPill(this,'style')">STORYTELLING</div>
+    <div class="pill" onclick="pickPill(this,'style')">FUNNY</div>
+  </div>
+  <label>LENGTH</label>
+  <div class="pills">
+    <div class="pill" onclick="pickPill(this,'length')">30 SEC</div>
+    <div class="pill active" onclick="pickPill(this,'length')">60 SEC</div>
+    <div class="pill" onclick="pickPill(this,'length')">3 MIN</div>
+  </div>
+  <button class="btn-generate" id="genBtn" onclick="generate()">GENERATE ▶</button>
+</div>
+
+<div class="log" id="log"></div>
+<div class="error" id="error"></div>
+
+<div class="result-card" id="results">
+  <div class="result-title" id="resultTitle"></div>
+  <div class="section-title">SCRIPT</div>
+  <div class="script-box" id="scriptBox"></div>
+  <button class="copy-btn" onclick="copyText('scriptBox')">COPY SCRIPT</button>
+  <div class="section-title">HASHTAGS</div>
+  <div class="tags" id="tagsBox"></div>
+  <button class="copy-btn" onclick="copyTags()">COPY HASHTAGS</button>
+  <div class="section-title">VIDEO CLIPS (PEXELS)</div>
+  <div class="clips" id="clipsBox"></div>
+</div>
+
 <script>
-const STYLE_PROMPTS = {
-  'MOTIVATIONAL': 'Write in an energetic, inspiring, motivational tone that pumps people up.',
-  'EDUCATIONAL': 'Write in a clear, informative, educational tone that teaches the viewer something valuable.',
-  'STORYTELLING': 'Write as a compelling narrative story with a beginning, middle and end.',
-  'FUNNY': 'Write in a fun, humorous, entertaining tone with light jokes and wit.'
-};
-const LENGTH_WORDS = { '30 SEC': '75-90', '60 SEC': '150-180', '3 MIN': '450-500' };
+var groqKey = '';
+var pexelsKey = '';
+var style = 'MOTIVATIONAL';
+var length = '60 SEC';
+var busy = false;
 
-let currentResult = null;
-let currentClips = [];
-let isGenerating = false;
-let isSpeaking = false;
-let sentences = [];
-let sentenceIdx = 0;
-let resumeInterval = null;
-let savedGroqKey = '';
-let savedPexelsKey = '';
-let selectedStyle = 'MOTIVATIONAL';
-let selectedLength = '60 SEC';
-
-window.addEventListener('load', () => {
+window.onload = function() {
   try {
-    const ak = localStorage.getItem('av_groq_key');
-    const pk = localStorage.getItem('av_pexels_key');
-    if (ak) { document.getElementById('anthropicKey').value = ak; savedGroqKey = ak; }
-    if (pk) { document.getElementById('pexelsKey').value = pk; savedPexelsKey = pk; }
-    if (ak) {
-      const ind = document.createElement('div');
-      ind.className = 'keys-saved-indicator';
-      ind.textContent = '✓ Keys loaded from this device';
-      document.querySelector('.keys-card').appendChild(ind);
-    }
+    var gk = localStorage.getItem('groq_key');
+    var pk = localStorage.getItem('pexels_key');
+    if (gk) { document.getElementById('groqKey').value = gk; groqKey = gk; }
+    if (pk) { document.getElementById('pexelsKey').value = pk; pexelsKey = pk; }
+    if (gk) { document.getElementById('keyStatus').style.display = 'block'; }
   } catch(e) {}
-});
-
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-function selectPill(el, group) {
-  el.closest('.option-pills').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-  if (group === 'style') selectedStyle = el.textContent.trim();
-  if (group === 'length') selectedLength = el.textContent.trim();
-}
+};
 
 function saveKeys() {
-  const ak = document.getElementById('anthropicKey').value.trim();
-  const pk = document.getElementById('pexelsKey').value.trim();
-  if (!ak) { alert('Please enter your Anthropic API key!'); return; }
-  savedGroqKey = ak;
-  savedPexelsKey = pk;
+  var gk = document.getElementById('groqKey').value.trim();
+  var pk = document.getElementById('pexelsKey').value.trim();
+  if (!gk) { alert('Please enter your Groq API key!'); return; }
+  groqKey = gk;
+  pexelsKey = pk;
   try {
-    localStorage.setItem('av_groq_key', ak);
-    localStorage.setItem('av_pexels_key', pk);
+    localStorage.setItem('groq_key', gk);
+    localStorage.setItem('pexels_key', pk);
   } catch(e) {}
-  const badge = document.getElementById('savedBadge');
-  badge.style.display = 'block';
-  setTimeout(() => badge.style.display = 'none', 4000);
+  var s = document.getElementById('keyStatus');
+  s.style.display = 'block';
+  s.textContent = '✓ Keys saved!';
+  setTimeout(function() { s.style.display = 'none'; }, 3000);
 }
 
-function switchTab(name, btn) {
-  document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + name).style.display = 'block';
-  btn.classList.add('active');
+function pickPill(el, group) {
+  var pills = el.parentNode.getElementsByClassName('pill');
+  for (var i = 0; i < pills.length; i++) pills[i].classList.remove('active');
+  el.classList.add('active');
+  if (group === 'style') style = el.textContent;
+  if (group === 'length') length = el.textContent;
 }
 
-function setStep(step) {
-  const steps = ['script','clips','render','done'];
-  const idx = steps.indexOf(step);
-  steps.forEach((s, i) => {
-    const chip = document.getElementById('step-' + s);
-    const line = document.getElementById('line-' + (i + 1));
-    if (i < idx) { chip.className = 'step-chip done'; if (line) line.className = 'step-line done'; }
-    else if (i === idx) { chip.className = 'step-chip active'; }
-    else { chip.className = 'step-chip'; if (line) line.className = 'step-line'; }
-  });
-}
-
-function setSpinner(on, text) {
-  document.getElementById('spinnerWrap').style.display = on ? 'flex' : 'none';
-  if (text) document.getElementById('spinnerText').textContent = text;
-}
-
-function addLog(msg, type) {
-  const box = document.getElementById('logBox');
+function addLog(msg) {
+  var box = document.getElementById('log');
   box.style.display = 'block';
- const t = new Date().toLocaleTimeString('en',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  const cursor = document.getElementById('cursor');
-  const line = document.createElement('div');
-  line.className = 'log-line';
-  line.innerHTML = `<span class="log-time">[${t}]</span><span class="log-${type}">${escHtml(msg)}</span>`;
-  box.insertBefore(line, cursor);
+  box.innerHTML += '<div>▶ ' + msg + '</div>';
   box.scrollTop = box.scrollHeight;
 }
 
-function setCursor(on) {
-  document.getElementById('cursor').style.display = on ? 'inline' : 'none';
-}
-
 function showError(msg) {
-  const box = document.getElementById('errorBox');
-  if (msg) { box.innerHTML = '⚠ ' + escHtml(msg); box.style.display = 'block'; }
-  else box.style.display = 'none';
+  var box = document.getElementById('error');
+  box.style.display = 'block';
+  box.textContent = '⚠ ' + msg;
 }
 
-function playVoice() {
-  if (!currentResult) return;
-  if (!('speechSynthesis' in window)) { alert('TTS not supported in this browser.'); return; }
-  stopVoice();
-  isSpeaking = true;
-  sentences = currentResult.script.match(/[^.!?]+[.!?]+/g) || [currentResult.script];
-  sentenceIdx = 0;
-  document.getElementById('playBtn').style.display = 'none';
-  document.getElementById('stopBtn').style.display = 'inline-block';
-  document.getElementById('speakIndicator').style.display = 'flex';
-  function speakNext() {
-    if (!isSpeaking || sentenceIdx >= sentences.length) {
-      if (sentenceIdx >= sentences.length) stopVoice();
-      return;
-    }
-    const utt = new SpeechSynthesisUtterance(sentences[sentenceIdx++]);
-    utt.rate = 1.05; utt.pitch = 1; utt.volume = 1;
-    utt.onend = () => { if (isSpeaking) speakNext(); };
-    utt.onerror = () => { if (isSpeaking) speakNext(); };
-    speechSynthesis.speak(utt);
-  }
-  resumeInterval = setInterval(() => {
-    if (!speechSynthesis.speaking && !speechSynthesis.pending && isSpeaking && sentenceIdx < sentences.length) speakNext();
-  }, 2000);
-  setTimeout(() => speakNext(), 150);
+function copyText(id) {
+  var text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(function() { alert('Copied!'); });
 }
 
-function stopVoice() {
-  isSpeaking = false;
-  clearInterval(resumeInterval);
-  if ('speechSynthesis' in window) speechSynthesis.cancel();
-  sentences = []; sentenceIdx = 0;
-  document.getElementById('playBtn').style.display = 'inline-block';
-  document.getElementById('stopBtn').style.display = 'none';
-  document.getElementById('speakIndicator').style.display = 'none';
+function copyTags() {
+  var tags = document.getElementById('tagsBox').querySelectorAll('.tag');
+  var text = Array.from(tags).map(function(t) { return t.textContent; }).join(' ');
+  navigator.clipboard.writeText(text).then(function() { alert('Copied!'); });
 }
 
-function copyScript() {
-  if (currentResult) navigator.clipboard?.writeText(currentResult.script).then(() => alert('Script copied!'));
+function getWordCount() {
+  if (length === '30 SEC') return '75-90';
+  if (length === '3 MIN') return '450-500';
+  return '150-180';
 }
 
-function copyHashtags() {
-  if (currentResult) navigator.clipboard?.writeText(
-    (currentResult.hashtags || []).+map(t => '#' + t).join(' ')
-  ).then(() => alert('Hashtags copied!'));
-}
-
-function copySubtitles() {
-  if (currentResult) navigator.clipboard?.writeText(
-    (currentResult.subtitles || []).join('\n')
-  ).then(() => alert('Subtitles copied!'));
-}
-
-function buildSystemPrompt() {
-  const styleInstr = STYLE_PROMPTS[selectedStyle] || STYLE_PROMPTS['MOTIVATIONAL'];
-  const wordCount = LENGTH_WORDS[selectedLength] || '150-180';
-  return `You are a viral short-form video script writer. ${styleInstr}
-Given a topic, return ONLY a valid JSON object with NO markdown, NO backticks, NO extra text.
-JSON structure:
-{
-  "title": "catchy video title",
-  "script": "full voiceover script ${wordCount} words",
-  "subtitles": ["line 1","line 2","line 3",...],
-  "hashtags": ["tag1","tag2",...],
-  "searchQuery": "2-3 word Pexels video search query"
-}`;
-}
-
-async function generateScript(topic) {
-  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + savedGroqKey
-    },
-    body: JSON.stringify({
-      model: 'llama3-70b-8192',
-      max_tokens: 4000,
-      system: buildSystemPrompt(),
-      messages: [{ role: 'user', content: 'Topic: ' + topic }]
-    })
-  });
-  if (!res.ok) {
-    let errMsg = 'API error ' + res.status;
-    try { const e = await res.json(); errMsg = e.error?.message || errMsg; } catch {}
-    throw new Error(errMsg);
-  }
-  const data = await res.json();
-  let text = data.choices[0].message.content;
-  let clean = text.replace(/```json|```/g, '').trim();
-  try { return JSON.parse(clean); } catch {
-    addLog('Repairing JSON...', 'warn');
-    const lb = clean.lastIndexOf('}');
-    if (lb > 0) {
-      let attempt = clean.substring(0, lb + 1);
-      const opens = (attempt.match(/\[/g)||[]).length - (attempt.match(/\]/g)||[]).length;
-      if (opens > 0) attempt = attempt.replace(/,?\s*$/, '') + ']'.repeat(opens) + '}';
-      try { return JSON.parse(attempt); } catch {}
-    }
-    throw new Error('Invalid JSON from AI — please try again.');
-  }
-}
-
-function makePlaceholders(query) {
-  const s = encodeURIComponent(query);
-  return [1,2,3,4].map(i => ({ id: i, url: null, pexelsPage: null, thumb: `https://picsum.photos/seed/${s}${i}/400/225` }));
-}
-
-async function fetchClips(query) {
-  if (!savedPexelsKey) { addLog('No Pexels key — showing placeholders.', 'warn'); return makePlaceholders(query); }
-  addLog(`Searching Pexels: "${query}"...`, 'info');
-  try {
-    const res = await fetch(
-      `https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&per_page=4&orientation=landscape`,
-      { headers: { Authorization: savedPexelsKey } }
-    );
-    if (!res.ok) throw new Error('Pexels ' + res.status);
-    const json = await res.json();
-    const videos = (json.videos || []).map(v => {
-      const hd = v.video_files?.find(f => f.quality === 'hd');
-      const sd = v.video_files?.find(f => f.quality === 'sd');
-      const file = hd || sd || v.video_files?.[0];
-      return { id: v.id, url: file?.link || null, thumb: v.image, pexelsPage: v.url };
-    });
-    if (!videos.length) throw new Error('No results');
-    addLog(`Got ${videos.length} clips!`, 'success');
-    return videos;
-  } catch (e) {
-    addLog(`Pexels failed (${e.message}) — using placeholders.`, 'warn');
-    return makePlaceholders(query);
-  }
-}
-
-function renderResults(data, clips) {
-  currentResult = data; currentClips = clips;
-  document.getElementById('results').style.display = 'block';
-  document.getElementById('resultTitle').textContent = data.title;
-  document.getElementById('scriptText').textContent = data.script;
-  document.getElementById('subtitlesList').innerHTML = (data.subtitles || []).map((line, i) =>
-    `<div class="subtitle-line"><span class="sub-num">${String(i+1).padStart(2,'0')}</span><span class="sub-text">${escHtml(line)}</span></div>`
-  ).join('');
-  document.getElementById('hashtagGrid').innerHTML = (data.hashtags || []).map(t => `<div class="hashtag">#${escHtml(t)}</div>`).join('');
-  document.getElementById('clipsLabel').textContent = savedPexelsKey ? 'PEXELS VIDEO CLIPS — TAP OPEN VIDEO TO WATCH' : 'ADD PEXELS KEY FOR REAL CLIPS';
-  document.getElementById('clipsGrid').innerHTML = clips.map(clip => `
-    <div class="clip-card">
-      <div class="clip-thumb">
-        <img src="${clip.thumb}" alt="clip" loading="lazy">
-        ${clip.url ? `<div class="play-overlay"><div class="play-circle">▶</div></div>` : ''}
-      </div>
-      <div class="clip-btns">
-        ${clip.url
-          ? `<a href="${clip.url}" target="_blank" rel="noopener noreferrer" class="btn-open-video">▶ OPEN VIDEO</a>
-             <a href="${clip.pexelsPage}" target="_blank" rel="noopener noreferrer" class="btn-pexels-page">VIEW ON PEXELS ↗</a>`
-          : `<div class="placeholder-label">PLACEHOLDER — ADD PEXELS KEY</div>`}
-      </div>
-    </div>`).join('');
-  if (savedPexelsKey) document.getElementById('pexelsCredit').style.display = 'block';
-  document.getElementById('stackBar').innerHTML = [
-    { label: 'SCRIPT AI', val: 'Claude Sonnet', color: '#7700ff' },
-    { label: 'STYLE', val: selectedStyle, color: '#00ffe7' },
-    { label: 'LENGTH', val: selectedLength, color: '#00ffe7' },
-    { label: 'CLIPS', val: savedPexelsKey ? 'Pexels API' : 'Placeholders', color: '#ffaa00' },
-    { label: 'HOST', val: 'GitHub Pages', color: '#00cc77' },
-  ].map(s => `<div class="stack-item" style="border-left:2px solid ${s.color}">
-    <div class="stack-label">${s.label}</div>
-    <div class="stack-val" style="color:${s.color}">${s.val}</div>
-  </div>`).join('');
+function getStylePrompt() {
+  if (style === 'EDUCATIONAL') return 'Clear and informative educational tone.';
+  if (style === 'STORYTELLING') return 'Compelling narrative story format.';
+  if (style === 'FUNNY') return 'Fun and humorous tone with wit.';
+  return 'Energetic and motivational tone.';
 }
 
 async function generate() {
-  if (isGenerating) return;
-  const topic = document.getElementById('topicInput').value.trim();
-  if (!topic) { alert('Please enter a video topic!'); return; }
-  if (!savedGroqKey) { alert('Please enter your Anthropic API key and tap SAVE KEYS first!'); return; }
-  isGenerating = true;
-  stopVoice(); showError('');
-  document.getElementById('logBox').innerHTML = '<span class="cursor" id="cursor">█</span>';
+  if (busy) return;
+  var topic = document.getElementById('topic').value.trim();
+  if (!topic) { alert('Please enter a topic!'); return; }
+  if (!groqKey) { alert('Please enter your Groq key and tap SAVE KEYS first!'); return; }
+
+  busy = true;
+  document.getElementById('log').innerHTML = '';
+  document.getElementById('error').style.display = 'none';
   document.getElementById('results').style.display = 'none';
-  document.getElementById('progress').style.display = 'flex';
   document.getElementById('genBtn').disabled = true;
   document.getElementById('genBtn').textContent = 'WORKING...';
-  document.getElementById('topicInput').disabled = true;
-  document.getElementById('inputCard').classList.add('glow');
-  setSpinner(true, 'GENERATING SCRIPT...');
-  addLog(`Starting: "${topic}" | Style: ${selectedStyle} | Length: ${selectedLength}`, 'start');
-  setCursor(true);
-  setStep('script');
-  let data;
-  try {
-    addLog('Generating script + hashtags + subtitles...', 'info');
-    data = await generateScript(topic);
-    addLog('Script ready!', 'success');
-  } catch (e) {
-    showError(e.message);
-    addLog('Failed: ' + e.message, 'error');
-    setSpinner(false);
-    reset(); return;
-  }
-  setStep('clips');
-  setSpinner(true, 'FETCHING VIDEO CLIPS...');
-  const clips = await fetchClips(data.searchQuery || topic);
-  setStep('render');
-  setSpinner(true, 'ASSEMBLING PROJECT...');
-  addLog('Assembling project...', 'info');
-  await new Promise(r => setTimeout(r, 400));
-  addLog('All assets ready!', 'success');
-  setStep('done');
-  setSpinner(false);
-  setCursor(false);
-  renderResults(data, clips);
-  reset();
-}
+  addLog('Starting: ' + topic);
 
-function reset() {
-  isGenerating = false;
+  try {
+    addLog('Calling Groq AI...');
+    var prompt = 'You are a viral video script writer. ' + getStylePrompt() + ' Return ONLY a valid JSON object with no markdown and no backticks. Use this exact structure: {"title":"video title","script":"script text ' + getWordCount() + ' words","hashtags":["tag1","tag2","tag3"],"searchQuery":"2 word search"}. Topic: ' + topic;
+
+    var res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + groqKey
+      },
+      body: JSON.stringify({
+        model: 'llama3-70b-8192',
+        max_tokens: 2000,
+        messages: [{ role: 'user', content: prompt }]
+      })
+    });
+
+    if (!res.ok) {
+      var err = await res.json();
+      throw new Error(err.error ? err.error.message : 'Groq error ' + res.status);
+    }
+
+    var data = await res.json();
+    var text = data.choices[0].message.content;
+    var clean = text.replace(/```json|```/g, '').trim();
+    var result = JSON.parse(clean);
+    addLog('Script ready!');
+
+    document.getElementById('resultTitle').textContent = result.title;
+    document.getElementById('scriptBox').textContent = result.script;
+    document.getElementById('tagsBox').innerHTML = (result.hashtags || []).map(function(t) {
+      return '<div class="tag">#' + t + '</div>';
+    }).join('');
+
+    if (pexelsKey) {
+      addLog('Fetching Pexels clips...');
+      try {
+        var pr = await fetch('https://api.pexels.com/videos/search?query=' + encodeURIComponent(result.searchQuery || topic) + '&per_page=4', {
+          headers: { Authorization: pexelsKey }
+        });
+        var pdata = await pr.json();
+        document.getElementById('clipsBox').innerHTML = (pdata.videos || []).map(function(v) {
+          var file = v.video_files && v.video_files[0];
+          return '<div class="clip"><img src="' + v.image + '" loading="lazy" />' + (file ? '<a href="' + file.link + '" target="_blank">▶ WATCH</a>' : '') + '</div>';
+        }).join('');
+        addLog('Clips loaded!');
+      } catch(e) {
+        addLog('Pexels failed: ' + e.message);
+      }
+    } else {
+      document.getElementById('clipsBox').innerHTML = '<p style="color:#4a7fa5;font-size:11px">Add Pexels key for video clips</p>';
+    }
+
+    document.getElementById('results').style.display = 'block';
+    addLog('Done! ✓');
+
+  } catch(e) {
+    showError(e.message);
+  }
+
+  busy = false;
   document.getElementById('genBtn').disabled = false;
   document.getElementById('genBtn').textContent = 'GENERATE ▶';
-  document.getElementById('topicInput').disabled = false;
-  document.getElementById('inputCard').classList.remove('glow');
 }
 </script>
 </body>
