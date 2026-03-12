@@ -247,7 +247,7 @@
   <div class="keys-card">
     <div class="keys-title">⚙ API KEYS</div>
     <div class="key-row">
-      <div class="key-label">ANTHROPIC KEY (for AI script)</div>
+      <div class="key-label">GROQ KEY (for AI script)</div>
       <input type="password" id="anthropicKey" placeholder="sk-ant-..." />
       <div class="key-hint">Get yours at console.anthropic.com</div>
     </div>
@@ -379,7 +379,7 @@ let selectedLength = '60 SEC';
 
 window.addEventListener('load', () => {
   try {
-    const ak = localStorage.getItem('av_anthropic_key');
+    const ak = localStorage.getItem('av_groq_key');
     const pk = localStorage.getItem('av_pexels_key');
     if (ak) { document.getElementById('anthropicKey').value = ak; savedAnthropicKey = ak; }
     if (pk) { document.getElementById('pexelsKey').value = pk; savedPexelsKey = pk; }
@@ -410,7 +410,7 @@ function saveKeys() {
   savedAnthropicKey = ak;
   savedPexelsKey = pk;
   try {
-    localStorage.setItem('av_anthropic_key', ak);
+    localStorage.setItem('av_groq_key', ak);
     localStorage.setItem('av_pexels_key', pk);
   } catch(e) {}
   const badge = document.getElementById('savedBadge');
@@ -507,7 +507,7 @@ function copyScript() {
 
 function copyHashtags() {
   if (currentResult) navigator.clipboard?.writeText(
-    (currentResult.hashtags || []).map(t => '#' + t).join(' ')
+    (currentResult.hashtags || []).+map(t => '#' + t).join(' ')
   ).then(() => alert('Hashtags copied!'));
 }
 
@@ -533,16 +533,14 @@ JSON structure:
 }
 
 async function generateScript(topic) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': savedAnthropicKey,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
+      'Authorization': 'Bearer ' + savedAnthropicKey
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: 'llama3-70b-8192',
       max_tokens: 4000,
       system: buildSystemPrompt(),
       messages: [{ role: 'user', content: 'Topic: ' + topic }]
@@ -554,7 +552,7 @@ async function generateScript(topic) {
     throw new Error(errMsg);
   }
   const data = await res.json();
-  let text = data.content.map(b => b.text || '').join('');
+  let text = data.choices[0].message.content;
   let clean = text.replace(/```json|```/g, '').trim();
   try { return JSON.parse(clean); } catch {
     addLog('Repairing JSON...', 'warn');
