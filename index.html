@@ -34,6 +34,7 @@
   @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
   @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
   @keyframes shimmer { 0%{background-position:-200% center} 100%{background-position:200% center} }
+  @keyframes spin { to{transform:rotate(360deg)} }
   .wrap { position:relative; z-index:2; max-width:860px; margin:0 auto; padding:32px 14px; }
   .badge {
     display:inline-block; border:1px solid #00ffe744; padding:4px 16px;
@@ -56,9 +57,10 @@
     background:#0a1628; border:1px solid #ffaa0055;
     border-radius:6px; padding:18px; margin-bottom:18px;
   }
-  .keys-card label { display:block; font-size:10px; letter-spacing:3px; color:#ffaa00; margin-bottom:8px; }
   .key-row { margin-bottom:14px; }
+  .key-label { font-size:9px; letter-spacing:2px; color:#ffaa00; margin-bottom:6px; }
   .key-hint { font-size:9px; color:#4a7fa5; margin-top:5px; letter-spacing:1px; }
+  .keys-title { font-size:10px; letter-spacing:3px; color:#ffaa00; margin-bottom:14px; }
   input[type=text], input[type=password] {
     width:100%; background:#060b14; border:1px solid #00ffe733;
     border-radius:3px; padding:11px 13px; color:#e0f0ff;
@@ -74,9 +76,9 @@
   .btn-primary:disabled { opacity:0.4; cursor:not-allowed; }
   .btn-save {
     background:linear-gradient(135deg,#ffaa00,#ff6600);
-    border:none; border-radius:3px; padding:11px 22px;
+    border:none; border-radius:3px; padding:13px 22px;
     color:#000; font-family:monospace; font-weight:900;
-    font-size:12px; letter-spacing:2px; cursor:pointer; width:100%;
+    font-size:12px; letter-spacing:2px; cursor:pointer; width:100%; margin-top:4px;
   }
   .btn-voice {
     background:linear-gradient(135deg,#7700ff,#0060ff);
@@ -96,6 +98,16 @@
   }
   .input-row { display:flex; gap:10px; flex-wrap:wrap; }
   .input-row input { flex:1; min-width:160px; }
+  .options-row { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
+  .option-group { flex:1; min-width:130px; }
+  .option-label { font-size:9px; letter-spacing:2px; color:#00ffe7aa; margin-bottom:6px; }
+  .option-pills { display:flex; gap:6px; flex-wrap:wrap; }
+  .pill {
+    background:#060b14; border:1px solid #00ffe733; border-radius:20px;
+    padding:6px 12px; color:#4a7fa5; font-family:monospace;
+    font-size:10px; letter-spacing:1px; cursor:pointer; transition:all 0.2s;
+  }
+  .pill.active { background:#00ffe722; border-color:#00ffe7; color:#00ffe7; }
   .progress {
     display:flex; align-items:center; justify-content:center;
     flex-wrap:wrap; gap:4px; margin-bottom:18px; animation:fadeUp 0.4s ease;
@@ -109,6 +121,13 @@
   .step-chip.done { background:#00ffe7; color:#000; border-color:#00ffe7; }
   .step-line { width:18px; height:1px; background:#1a2a3a; }
   .step-line.done { background:#00ffe7; }
+  .spinner-wrap { display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+  .spinner {
+    width:18px; height:18px; border:2px solid #00ffe722;
+    border-top-color:#00ffe7; border-radius:50%;
+    animation:spin 0.8s linear infinite;
+  }
+  .spinner-text { font-size:11px; color:#00ffe7; letter-spacing:2px; }
   .log-box {
     background:#04080f; border:1px solid #00ffe722;
     border-radius:4px; padding:12px; margin-bottom:18px;
@@ -124,8 +143,8 @@
   .cursor { color:#00ffe7aa; animation:blink 1s infinite; }
   .error-box {
     background:#1a0408; border:1px solid #ff445566;
-    border-radius:4px; padding:12px; margin-bottom:18px;
-    color:#ff6677; font-size:12px;
+    border-radius:4px; padding:14px; margin-bottom:18px;
+    color:#ff6677; font-size:12px; line-height:1.8;
   }
   .title-bar {
     background:linear-gradient(90deg,#00ffe711,transparent);
@@ -143,10 +162,7 @@
     font-family:monospace; font-weight:700;
     transform:translateY(1px); transition:all 0.2s;
   }
-  .tab-btn.active {
-    background:#0a1628; border-color:#00ffe7;
-    border-bottom-color:#0a1628; color:#00ffe7;
-  }
+  .tab-btn.active { background:#0a1628; border-color:#00ffe7; border-bottom-color:#0a1628; color:#00ffe7; }
   .tab-content {
     background:#0a1628; border:1px solid #1a2a3a;
     border-top:none; border-radius:0 2px 6px 6px;
@@ -173,8 +189,7 @@
   .hashtag-grid { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
   .hashtag {
     background:#060b14; border:1px solid #00ffe733;
-    border-radius:2px; padding:5px 11px;
-    color:#00ffe7; font-size:11px; font-weight:700;
+    border-radius:2px; padding:5px 11px; color:#00ffe7; font-size:11px; font-weight:700;
   }
   .clips-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(170px,1fr)); gap:12px; }
   .clip-card { background:#060b14; border:1px solid #1a2a3a; border-radius:6px; overflow:hidden; }
@@ -211,10 +226,11 @@
   .stack-val { font-size:11px; font-weight:700; }
   #pexelsCredit { display:none; text-align:center; font-size:9px; color:#2a4a6a; letter-spacing:2px; margin-top:8px; }
   .saved-badge {
-    display:inline-block; background:#00ffe722; border:1px solid #00ffe755;
-    color:#00ffe7; font-size:9px; letter-spacing:2px; padding:4px 12px;
-    border-radius:2px; margin-top:10px;
+    display:block; background:#00ffe722; border:1px solid #00ffe755;
+    color:#00ffe7; font-size:9px; letter-spacing:2px; padding:8px 14px;
+    border-radius:2px; margin-top:10px; text-align:center;
   }
+  .keys-saved-indicator { font-size:9px; color:#00ffe7; letter-spacing:2px; margin-top:8px; }
 </style>
 </head>
 <body>
@@ -228,33 +244,51 @@
     <p class="subtitle">SCRIPT · VOICE · CLIPS · HASHTAGS · SUBTITLES</p>
   </div>
 
-  <!-- API Keys Card -->
   <div class="keys-card">
-    <label>⚙ API KEYS — REQUIRED TO USE THE APP</label>
+    <div class="keys-title">⚙ API KEYS</div>
     <div class="key-row">
-      <div style="font-size:9px;letter-spacing:2px;color:#ffaa00;margin-bottom:6px;">ANTHROPIC KEY (for AI script)</div>
-      <input type="password" id="anthropicKey" placeholder="sk-ant-api03-..." />
+      <div class="key-label">ANTHROPIC KEY (for AI script)</div>
+      <input type="password" id="anthropicKey" placeholder="sk-ant-..." />
       <div class="key-hint">Get yours at console.anthropic.com</div>
     </div>
     <div class="key-row">
-      <div style="font-size:9px;letter-spacing:2px;color:#ffaa00;margin-bottom:6px;">PEXELS KEY (for video clips)</div>
+      <div class="key-label">PEXELS KEY (for video clips)</div>
       <input type="password" id="pexelsKey" placeholder="Paste Pexels API key..." />
       <div class="key-hint">Get yours at pexels.com/api</div>
     </div>
     <button class="btn-save" onclick="saveKeys()">SAVE KEYS ✓</button>
-    <div id="savedBadge" style="display:none" class="saved-badge">✓ KEYS SAVED — READY TO GENERATE</div>
+    <div id="savedBadge" style="display:none" class="saved-badge">✓ KEYS SAVED — WILL BE REMEMBERED ON THIS DEVICE</div>
   </div>
 
-  <!-- Input -->
   <div class="card" id="inputCard">
     <label>VIDEO TOPIC</label>
     <div class="input-row">
-      <input type="text" id="topicInput" placeholder="e.g. How AI is changing the world..." />
+      <input type="text" id="topicInput" placeholder="e.g. Romans 10:9-10..." />
       <button class="btn-primary" id="genBtn" onclick="generate()">GENERATE ▶</button>
+    </div>
+    <div class="options-row">
+      <div class="option-group">
+        <div class="option-label">VIDEO STYLE</div>
+        <div class="option-pills">
+          <div class="pill active" onclick="selectPill(this,'style')">MOTIVATIONAL</div>
+          <div class="pill" onclick="selectPill(this,'style')">EDUCATIONAL</div>
+          <div class="pill" onclick="selectPill(this,'style')">STORYTELLING</div>
+          <div class="pill" onclick="selectPill(this,'style')">FUNNY</div>
+        </div>
+      </div>
+    </div>
+    <div class="options-row">
+      <div class="option-group">
+        <div class="option-label">VIDEO LENGTH</div>
+        <div class="option-pills">
+          <div class="pill" onclick="selectPill(this,'length')">30 SEC</div>
+          <div class="pill active" onclick="selectPill(this,'length')">60 SEC</div>
+          <div class="pill" onclick="selectPill(this,'length')">3 MIN</div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Progress -->
   <div class="progress" id="progress" style="display:none">
     <div class="step-chip" id="step-script">SCRIPT</div>
     <div class="step-line" id="line-1"></div>
@@ -265,15 +299,17 @@
     <div class="step-chip" id="step-done">DONE</div>
   </div>
 
-  <!-- Log -->
+  <div class="spinner-wrap" id="spinnerWrap" style="display:none">
+    <div class="spinner"></div>
+    <div class="spinner-text" id="spinnerText">GENERATING...</div>
+  </div>
+
   <div class="log-box" id="logBox" style="display:none">
     <span class="cursor" id="cursor">█</span>
   </div>
 
-  <!-- Error -->
   <div class="error-box" id="errorBox" style="display:none"></div>
 
-  <!-- Results -->
   <div id="results" style="display:none">
     <div class="title-bar">
       <div class="title-label">GENERATED TITLE</div>
@@ -299,6 +335,9 @@
       <div class="script-text" id="scriptText"></div>
     </div>
     <div class="tab-content" id="tab-subtitles" style="display:none">
+      <div style="margin-bottom:12px">
+        <button class="btn-outline" onclick="copySubtitles()">COPY ALL SUBTITLES</button>
+      </div>
       <div id="subtitlesList"></div>
     </div>
     <div class="tab-content" id="tab-hashtags" style="display:none">
@@ -318,16 +357,13 @@
 
 </div>
 <script>
-const SYSTEM_PROMPT = `You are a viral short-form video script writer. Given a topic, return ONLY a valid JSON object with NO markdown, NO backticks, NO extra text.
-
-JSON structure:
-{
-  "title": "catchy video title",
-  "script": "full voiceover script 150-200 words, engaging and punchy",
-  "subtitles": ["line 1","line 2","line 3",...],
-  "hashtags": ["tag1","tag2",...],
-  "searchQuery": "2-3 word Pexels video search query"
-}`;
+const STYLE_PROMPTS = {
+  'MOTIVATIONAL': 'Write in an energetic, inspiring, motivational tone that pumps people up.',
+  'EDUCATIONAL': 'Write in a clear, informative, educational tone that teaches the viewer something valuable.',
+  'STORYTELLING': 'Write as a compelling narrative story with a beginning, middle and end.',
+  'FUNNY': 'Write in a fun, humorous, entertaining tone with light jokes and wit.'
+};
+const LENGTH_WORDS = { '30 SEC': '75-90', '60 SEC': '150-180', '3 MIN': '450-500' };
 
 let currentResult = null;
 let currentClips = [];
@@ -336,17 +372,50 @@ let isSpeaking = false;
 let sentences = [];
 let sentenceIdx = 0;
 let resumeInterval = null;
+let savedAnthropicKey = '';
+let savedPexelsKey = '';
+let selectedStyle = 'MOTIVATIONAL';
+let selectedLength = '60 SEC';
+
+window.addEventListener('load', () => {
+  try {
+    const ak = localStorage.getItem('av_anthropic_key');
+    const pk = localStorage.getItem('av_pexels_key');
+    if (ak) { document.getElementById('anthropicKey').value = ak; savedAnthropicKey = ak; }
+    if (pk) { document.getElementById('pexelsKey').value = pk; savedPexelsKey = pk; }
+    if (ak) {
+      const ind = document.createElement('div');
+      ind.className = 'keys-saved-indicator';
+      ind.textContent = '✓ Keys loaded from this device';
+      document.querySelector('.keys-card').appendChild(ind);
+    }
+  } catch(e) {}
+});
 
 function escHtml(s) {
   return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function selectPill(el, group) {
+  el.closest('.option-pills').querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  if (group === 'style') selectedStyle = el.textContent.trim();
+  if (group === 'length') selectedLength = el.textContent.trim();
 }
 
 function saveKeys() {
   const ak = document.getElementById('anthropicKey').value.trim();
   const pk = document.getElementById('pexelsKey').value.trim();
   if (!ak) { alert('Please enter your Anthropic API key!'); return; }
-  document.getElementById('savedBadge').style.display = 'inline-block';
-  setTimeout(() => document.getElementById('savedBadge').style.display = 'none', 3000);
+  savedAnthropicKey = ak;
+  savedPexelsKey = pk;
+  try {
+    localStorage.setItem('av_anthropic_key', ak);
+    localStorage.setItem('av_pexels_key', pk);
+  } catch(e) {}
+  const badge = document.getElementById('savedBadge');
+  badge.style.display = 'block';
+  setTimeout(() => badge.style.display = 'none', 4000);
 }
 
 function switchTab(name, btn) {
@@ -368,10 +437,15 @@ function setStep(step) {
   });
 }
 
+function setSpinner(on, text) {
+  document.getElementById('spinnerWrap').style.display = on ? 'flex' : 'none';
+  if (text) document.getElementById('spinnerText').textContent = text;
+}
+
 function addLog(msg, type) {
   const box = document.getElementById('logBox');
   box.style.display = 'block';
-  const t = new Date().toLocaleTimeString('en',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
+ const t = new Date().toLocaleTimeString('en',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
   const cursor = document.getElementById('cursor');
   const line = document.createElement('div');
   line.className = 'log-line';
@@ -386,7 +460,7 @@ function setCursor(on) {
 
 function showError(msg) {
   const box = document.getElementById('errorBox');
-  if (msg) { box.textContent = '⚠ ' + msg; box.style.display = 'block'; }
+  if (msg) { box.innerHTML = '⚠ ' + escHtml(msg); box.style.display = 'block'; }
   else box.style.display = 'none';
 }
 
@@ -437,18 +511,181 @@ function copyHashtags() {
   ).then(() => alert('Hashtags copied!'));
 }
 
+function copySubtitles() {
+  if (currentResult) navigator.clipboard?.writeText(
+    (currentResult.subtitles || []).join('\n')
+  ).then(() => alert('Subtitles copied!'));
+}
+
+function buildSystemPrompt() {
+  const styleInstr = STYLE_PROMPTS[selectedStyle] || STYLE_PROMPTS['MOTIVATIONAL'];
+  const wordCount = LENGTH_WORDS[selectedLength] || '150-180';
+  return `You are a viral short-form video script writer. ${styleInstr}
+Given a topic, return ONLY a valid JSON object with NO markdown, NO backticks, NO extra text.
+JSON structure:
+{
+  "title": "catchy video title",
+  "script": "full voiceover script ${wordCount} words",
+  "subtitles": ["line 1","line 2","line 3",...],
+  "hashtags": ["tag1","tag2",...],
+  "searchQuery": "2-3 word Pexels video search query"
+}`;
+}
+
 async function generateScript(topic) {
-  const ak = document.getElementById('anthropicKey').value.trim();
-  if (!ak) throw new Error('Please enter your Anthropic API key and tap SAVE KEYS first!');
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-api-key': ak, 'anthropic-version': '2023-06-01' },
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': savedAnthropicKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 4000,
-      system: SYSTEM_PROMPT,
+      system: buildSystemPrompt(),
       messages: [{ role: 'user', content: 'Topic: ' + topic }]
     })
   });
-  if (!res.ok) throw new Error('API error ' + res.status + ' — check your Anthropic key');
-  const data = a
+  if (!res.ok) {
+    let errMsg = 'API error ' + res.status;
+    try { const e = await res.json(); errMsg = e.error?.message || errMsg; } catch {}
+    throw new Error(errMsg);
+  }
+  const data = await res.json();
+  let text = data.content.map(b => b.text || '').join('');
+  let clean = text.replace(/```json|```/g, '').trim();
+  try { return JSON.parse(clean); } catch {
+    addLog('Repairing JSON...', 'warn');
+    const lb = clean.lastIndexOf('}');
+    if (lb > 0) {
+      let attempt = clean.substring(0, lb + 1);
+      const opens = (attempt.match(/\[/g)||[]).length - (attempt.match(/\]/g)||[]).length;
+      if (opens > 0) attempt = attempt.replace(/,?\s*$/, '') + ']'.repeat(opens) + '}';
+      try { return JSON.parse(attempt); } catch {}
+    }
+    throw new Error('Invalid JSON from AI — please try again.');
+  }
+}
+
+function makePlaceholders(query) {
+  const s = encodeURIComponent(query);
+  return [1,2,3,4].map(i => ({ id: i, url: null, pexelsPage: null, thumb: `https://picsum.photos/seed/${s}${i}/400/225` }));
+}
+
+async function fetchClips(query) {
+  if (!savedPexelsKey) { addLog('No Pexels key — showing placeholders.', 'warn'); return makePlaceholders(query); }
+  addLog(`Searching Pexels: "${query}"...`, 'info');
+  try {
+    const res = await fetch(
+      `https://api.pexels.com/videos/search?query=${encodeURIComponent(query)}&per_page=4&orientation=landscape`,
+      { headers: { Authorization: savedPexelsKey } }
+    );
+    if (!res.ok) throw new Error('Pexels ' + res.status);
+    const json = await res.json();
+    const videos = (json.videos || []).map(v => {
+      const hd = v.video_files?.find(f => f.quality === 'hd');
+      const sd = v.video_files?.find(f => f.quality === 'sd');
+      const file = hd || sd || v.video_files?.[0];
+      return { id: v.id, url: file?.link || null, thumb: v.image, pexelsPage: v.url };
+    });
+    if (!videos.length) throw new Error('No results');
+    addLog(`Got ${videos.length} clips!`, 'success');
+    return videos;
+  } catch (e) {
+    addLog(`Pexels failed (${e.message}) — using placeholders.`, 'warn');
+    return makePlaceholders(query);
+  }
+}
+
+function renderResults(data, clips) {
+  currentResult = data; currentClips = clips;
+  document.getElementById('results').style.display = 'block';
+  document.getElementById('resultTitle').textContent = data.title;
+  document.getElementById('scriptText').textContent = data.script;
+  document.getElementById('subtitlesList').innerHTML = (data.subtitles || []).map((line, i) =>
+    `<div class="subtitle-line"><span class="sub-num">${String(i+1).padStart(2,'0')}</span><span class="sub-text">${escHtml(line)}</span></div>`
+  ).join('');
+  document.getElementById('hashtagGrid').innerHTML = (data.hashtags || []).map(t => `<div class="hashtag">#${escHtml(t)}</div>`).join('');
+  document.getElementById('clipsLabel').textContent = savedPexelsKey ? 'PEXELS VIDEO CLIPS — TAP OPEN VIDEO TO WATCH' : 'ADD PEXELS KEY FOR REAL CLIPS';
+  document.getElementById('clipsGrid').innerHTML = clips.map(clip => `
+    <div class="clip-card">
+      <div class="clip-thumb">
+        <img src="${clip.thumb}" alt="clip" loading="lazy">
+        ${clip.url ? `<div class="play-overlay"><div class="play-circle">▶</div></div>` : ''}
+      </div>
+      <div class="clip-btns">
+        ${clip.url
+          ? `<a href="${clip.url}" target="_blank" rel="noopener noreferrer" class="btn-open-video">▶ OPEN VIDEO</a>
+             <a href="${clip.pexelsPage}" target="_blank" rel="noopener noreferrer" class="btn-pexels-page">VIEW ON PEXELS ↗</a>`
+          : `<div class="placeholder-label">PLACEHOLDER — ADD PEXELS KEY</div>`}
+      </div>
+    </div>`).join('');
+  if (savedPexelsKey) document.getElementById('pexelsCredit').style.display = 'block';
+  document.getElementById('stackBar').innerHTML = [
+    { label: 'SCRIPT AI', val: 'Claude Sonnet', color: '#7700ff' },
+    { label: 'STYLE', val: selectedStyle, color: '#00ffe7' },
+    { label: 'LENGTH', val: selectedLength, color: '#00ffe7' },
+    { label: 'CLIPS', val: savedPexelsKey ? 'Pexels API' : 'Placeholders', color: '#ffaa00' },
+    { label: 'HOST', val: 'GitHub Pages', color: '#00cc77' },
+  ].map(s => `<div class="stack-item" style="border-left:2px solid ${s.color}">
+    <div class="stack-label">${s.label}</div>
+    <div class="stack-val" style="color:${s.color}">${s.val}</div>
+  </div>`).join('');
+}
+
+async function generate() {
+  if (isGenerating) return;
+  const topic = document.getElementById('topicInput').value.trim();
+  if (!topic) { alert('Please enter a video topic!'); return; }
+  if (!savedAnthropicKey) { alert('Please enter your Anthropic API key and tap SAVE KEYS first!'); return; }
+  isGenerating = true;
+  stopVoice(); showError('');
+  document.getElementById('logBox').innerHTML = '<span class="cursor" id="cursor">█</span>';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('progress').style.display = 'flex';
+  document.getElementById('genBtn').disabled = true;
+  document.getElementById('genBtn').textContent = 'WORKING...';
+  document.getElementById('topicInput').disabled = true;
+  document.getElementById('inputCard').classList.add('glow');
+  setSpinner(true, 'GENERATING SCRIPT...');
+  addLog(`Starting: "${topic}" | Style: ${selectedStyle} | Length: ${selectedLength}`, 'start');
+  setCursor(true);
+  setStep('script');
+  let data;
+  try {
+    addLog('Generating script + hashtags + subtitles...', 'info');
+    data = await generateScript(topic);
+    addLog('Script ready!', 'success');
+  } catch (e) {
+    showError(e.message);
+    addLog('Failed: ' + e.message, 'error');
+    setSpinner(false);
+    reset(); return;
+  }
+  setStep('clips');
+  setSpinner(true, 'FETCHING VIDEO CLIPS...');
+  const clips = await fetchClips(data.searchQuery || topic);
+  setStep('render');
+  setSpinner(true, 'ASSEMBLING PROJECT...');
+  addLog('Assembling project...', 'info');
+  await new Promise(r => setTimeout(r, 400));
+  addLog('All assets ready!', 'success');
+  setStep('done');
+  setSpinner(false);
+  setCursor(false);
+  renderResults(data, clips);
+  reset();
+}
+
+function reset() {
+  isGenerating = false;
+  document.getElementById('genBtn').disabled = false;
+  document.getElementById('genBtn').textContent = 'GENERATE ▶';
+  document.getElementById('topicInput').disabled = false;
+  document.getElementById('inputCard').classList.remove('glow');
+}
+</script>
+</body>
+</html>
